@@ -22,6 +22,7 @@ export default function Home() {
   const deleteTask = useMutation(api.tasks.deleteTask);
   const storeUser = useMutation(api.users.storeUser);
   const users = useQuery(api.users.list, isAuthenticated ? {} : "skip");
+  const userProfile = useQuery(api.users.getMyProfile, isAuthenticated ? {} : "skip");
   const isAdmin = users !== undefined && users !== null;
 
   useEffect(() => {
@@ -53,8 +54,25 @@ export default function Home() {
     return <div>Por favor, inicia sesión para ver tus tareas.</div>;
   }
 
+
+  const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const paymentStatus = searchParams?.get("payment");
+
   return (
     <main className="min-h-screen  bg-slate-50 from-indigo-50 via-white to-cyan-50 py-12 px-4">
+      {paymentStatus === "success" && (
+        <div className="max-w-7xl mx-auto mb-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-r shadow-md animate-in fade-in slide-in-from-top-4" role="alert">
+          <p className="font-bold">¡Pago exitoso!</p>
+          <p>Tu suscripción Pro ha sido activada. Ahora puedes crear tareas ilimitadas.</p>
+        </div>
+      )}
+      {paymentStatus === "cancel" && (
+        <div className="max-w-7xl mx-auto mb-6 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-r shadow-md animate-in fade-in slide-in-from-top-4" role="alert">
+          <p className="font-bold">Pago cancelado</p>
+          <p>El proceso de pago fue cancelado. No se han realizado cargos.</p>
+        </div>
+      )}
+
       <nav className="flex justify-between items-center p-8 max-w-7xl mx-auto w-full">
         <div className="text-3xl font-bold text-indigo-600 tracking-tighter">
           TaskMaster AI
@@ -102,6 +120,12 @@ export default function Home() {
               </span>{" "}
               tareas pendientes
             </p>
+            {/* DEBUG INFO */}
+            {userProfile && (
+              <div className="mt-2 text-xs font-mono text-gray-400">
+                Estado: {userProfile.subscriptionStatus || "free"} | ID: {userProfile.clerkId}
+              </div>
+            )}
           </header>
 
           <section className="space-y-8">

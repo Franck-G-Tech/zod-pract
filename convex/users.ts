@@ -22,6 +22,18 @@ export const list = query({
   },
 });
 
+export const getMyProfile = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+    const userId = identity.tokenIdentifier.split("|")[1];
+    return await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", userId))
+      .unique();
+  },
+});
+
 // La mutación para la "palomita" (isAdmin [x])
 export const toggleAdmin = mutation({
   args: { id: v.id("users"), isAdmin: v.boolean() },
