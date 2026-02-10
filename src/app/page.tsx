@@ -6,8 +6,17 @@ import {
   SignedOut,
 } from "@clerk/nextjs";
 import Link from "next/link";
+import { client } from "../sanity/lib/client";
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const query = `*[_type == "landing"][0]`;
+  const data = await client.fetch(query);
+
+  const content = {
+    title: data?.title || "Organiza tu día, conquista tus metas.",
+    description: data?.description || "La lista de tareas más rápida y segura. Diseñada para mantenerte enfocado con sincronización en tiempo real.",
+      buttonText: data?.buttonText || "Empezar ahora — Gratis",
+  };
   return (
 <div className="h-screen w-full bg-slate-50 flex flex-col overflow-hidden">
   
@@ -39,13 +48,11 @@ export default function LandingPage() {
     <div className="max-w-4xl w-full space-y-10">
       {/* Texto Principal */}
       <div className="space-y-4">
-        <h1 className="text-6xl md:text-8xl font-black text-slate-500 tracking-tighter leading-tight">
-          Organiza tu día, <br />
-          <span className="text-indigo-600">conquista tus metas.</span>
+        <h1 className="text-6xl md:text-8xl font-black text-indigo-600 tracking-tighter leading-tight">
+          {content.title}
         </h1>
         <p className="text-xl md:text-2xl text-slate-500 max-w-2xl mx-auto font-medium ">
-          La lista de tareas más rápida y segura. Diseñada para mantenerte enfocado 
-          con sincronización en tiempo real.
+          {content.description}
         </p>
       </div>
 
@@ -54,7 +61,7 @@ export default function LandingPage() {
         <SignedOut>
           <SignUpButton mode="modal">
             <button className="bg-indigo-600 text-white text-xl px-12 py-5 rounded-2xl hover:bg-indigo-700 transition-all shadow-2xl hover:scale-105 active:scale-95 transform font-black">
-              Empezar ahora — Gratis
+              {content.buttonText}
             </button>
           </SignUpButton>
         </SignedOut>

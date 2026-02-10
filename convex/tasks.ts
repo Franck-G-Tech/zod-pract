@@ -16,8 +16,10 @@ export const get = query({
 });
 
 export const create = mutation({
-    args: { title: v.string() },
-    handler: async (ctx, { title }) => {
+    args: { title: v.string(),
+        taskLimit: v.number(),
+     },
+    handler: async (ctx, { title, taskLimit }) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) {
             throw new Error("Unauthorized");
@@ -39,7 +41,7 @@ export const create = mutation({
 
         // 3. Regla de Negocio: Límite de 5 para usuarios gratuitos
         const isPro = user?.subscriptionStatus === "active";
-        if (!isPro && userTasks.length >= 5) {
+        if (!isPro && userTasks.length >= taskLimit) {
             // El backend bloquea la acción
             throw new Error("LIMIT_REACHED");
         }

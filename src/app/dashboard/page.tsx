@@ -10,20 +10,30 @@ import {
   SignInButton,
   SignUpButton,
 } from "@clerk/nextjs";
-import { useEffect } from "react";
 import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
-
+import { useState, useEffect } from "react";
+import { client } from "@/sanity/lib/client";
+interface CMSConfig {
+  successMessage?: string;
+  cancelMessage?: string;
+  limitMessage?: string;
+  taskLimit: number;
+}
 export default function Home() {
+  const [cmsConfig, setCmsConfig] = useState<CMSConfig | null>(null);
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
-
   const todos = useQuery(api.tasks.get, isAuthenticated ? {} : "skip");
   const updateTask = useMutation(api.tasks.update);
   const deleteTask = useMutation(api.tasks.deleteTask);
   const storeUser = useMutation(api.users.storeUser);
   const users = useQuery(api.users.list, isAuthenticated ? {} : "skip");
-  const userProfile = useQuery(api.users.getMyProfile, isAuthenticated ? {} : "skip");
+  const userProfile = useQuery(
+    api.users.getMyProfile,
+    isAuthenticated ? {} : "skip",
+  );
   const isAdmin = users !== undefined && users !== null;
+  const [isLoadingConfig, setIsLoadingConfig] = useState(true);
 
   useEffect(() => {
     // Esta función se ejecuta silenciosamente al cargar la página
@@ -38,6 +48,18 @@ export default function Home() {
 
     syncUser();
   }, [storeUser]);
+    useEffect(() => {
+  const fetchConfig = async () => {
+    try {
+      const query = `*[_type == "siteConfig"][0]`;
+      const data = await client.fetch(query);
+      setCmsConfig(data);
+    } finally {
+      setIsLoadingConfig(false);
+    }
+  };
+  fetchConfig();
+}, []);
 
   if (todos === undefined) {
     return (
@@ -46,7 +68,7 @@ export default function Home() {
       </div>
     );
   }
-  if (authLoading) {
+  if (authLoading || isLoadingConfig) {
     return <div>Cargando autenticación...</div>;
   }
 
@@ -54,20 +76,39 @@ export default function Home() {
     return <div>Por favor, inicia sesión para ver tus tareas.</div>;
   }
 
-
-  const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const searchParams =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search)
+      : null;
   const paymentStatus = searchParams?.get("payment");
+
+  const messages = {
+    tasklimit: cmsConfig?.taskLimit || 4,
+    successPayment: cmsConfig?.successMessage || "¡Pago exitoso!",
+    cancelPayment: cmsConfig?.cancelMessage || "Pago cancelado",
+    limitReached:
+      cmsConfig?.limitMessage || `Has alcanzado el límite de ${cmsConfig?.taskLimit || 4} tareas.`,
+  };
 
   return (
     <main className="min-h-screen  bg-slate-50 from-indigo-50 via-white to-cyan-50 py-12 px-4">
       {paymentStatus === "success" && (
-        <div className="max-w-7xl mx-auto mb-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-r shadow-md animate-in fade-in slide-in-from-top-4" role="alert">
+        <div
+          className="max-w-7xl mx-auto mb-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-r shadow-md animate-in fade-in slide-in-from-top-4"
+          role="alert"
+        >
           <p className="font-bold">¡Pago exitoso!</p>
-          <p>Tu suscripción Pro ha sido activada. Ahora puedes crear tareas ilimitadas.</p>
+          <p>
+            Tu suscripción Pro ha sido activada. Ahora puedes crear tareas
+            ilimitadas.
+          </p>
         </div>
       )}
       {paymentStatus === "cancel" && (
-        <div className="max-w-7xl mx-auto mb-6 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-r shadow-md animate-in fade-in slide-in-from-top-4" role="alert">
+        <div
+          className="max-w-7xl mx-auto mb-6 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-r shadow-md animate-in fade-in slide-in-from-top-4"
+          role="alert"
+        >
           <p className="font-bold">Pago cancelado</p>
           <p>El proceso de pago fue cancelado. No se han realizado cargos.</p>
         </div>
@@ -123,14 +164,18 @@ export default function Home() {
             {/* DEBUG INFO */}
             {userProfile && (
               <div className="mt-2 text-xs font-mono text-gray-400">
-                Estado: {userProfile.subscriptionStatus || "free"} | ID: {userProfile.clerkId}
+                Estado: {userProfile.subscriptionStatus || "free"}
               </div>
             )}
           </header>
 
           <section className="space-y-8">
             <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-              <TodoForm />
+              <TodoForm
+                taskLimit={messages.tasklimit}
+                limitMessage={messages.limitReached}
+                successMessage={messages.successPayment}
+              />
             </div>
 
             <div className="relative">

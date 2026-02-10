@@ -6,6 +6,7 @@ const isPublicRoute = createRouteMatcher([
   '/',                // Landing Page
   '/sign-in(.*)',     // Login
   '/sign-up(.*)',     // Registro
+  '/studio(.*)',     // Sanity Studio (opcional, si quieres que sea público)
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
