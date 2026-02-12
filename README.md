@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+🚀 Task Manager Pro
+Este proyecto es una aplicación de gestión de tareas diseñada para demostrar un flujo de trabajo profesional, integrando configuraciones dinámicas desde un CMS y validaciones en tiempo real en el backend.
 
-## Getting Started
+🛠️ Stack Tecnológico
+El proyecto utiliza las tecnologías más modernas para garantizar velocidad y escalabilidad:
 
-First, run the development server:
+Frontend: Next.js (App Router) con TypeScript.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Backend & DB: Convex para persistencia de datos en tiempo real.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+CMS: Sanity.io para la gestión de reglas de negocio y límites de usuario.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Autenticación: Clerk para el manejo de sesiones de usuario.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Estilos: Tailwind CSS y Lucide React para iconografía.
 
-## Learn More
+🏗️ Arquitectura General
+La aplicación sigue un flujo de datos desacoplado:
 
-To learn more about Next.js, take a look at the following resources:
+Sanity provee la configuración (ej. límite de tareas).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Next.js orquestra la UI y envía los parámetros a las mutaciones.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Convex valida la lógica de negocio antes de guardar los datos.
 
-## Deploy on Vercel
+📘 Para más detalles, consulta nuestra Documentación de Arquitectura.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+💻 Cómo correrlo local
+Para levantar el proyecto en tu máquina local, sigue estos pasos simplificados:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Clona el repo: git clone <tu-repo-url>
+
+Instala dependencias: pnpm install
+
+Configura variables: Copia el archivo .env.example a .env.local con tus llaves.
+
+Backend: Ejecuta npx convex dev en una terminal.
+
+Frontend: Ejecuta pnpm dev en otra terminal.
+
+⚙️ Instrucciones detalladas de variables de entorno en: Guía de Setup.
+
+🤝 Colaboración y Decisiones
+Mantenemos un registro estricto de nuestras decisiones técnicas (ADRs) para asegurar la trazabilidad del proyecto.
+
+Registro de Decisiones (ADRs)
+
+Flujo de trabajo: GitFlow (Ramas feature/ -> develop -> main).
+
+🚀 ¿Cuál es el siguiente paso?
+
+Como este cambio también es documentación, podrías agregarlo a la misma rama en la que estás (feature/setup-tech-docs) antes de cerrar el Pull Request.
+
+¿Te gustaría que te ayude a redactar el comando para actualizar tu commit actual con este nuevo archivo README.md?
